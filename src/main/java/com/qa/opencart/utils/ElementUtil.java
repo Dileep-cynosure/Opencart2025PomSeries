@@ -30,9 +30,11 @@ import com.qa.opencart.exceptions.ElementException;
 public class ElementUtil {
 
 	private WebDriver driver;
+	private JavaScriptUtil js;
 
 	public ElementUtil(WebDriver driver) {
 		this.driver = driver;
+		js = new JavaScriptUtil(driver);
 	}
 
 	private void nullCheck(String value) {
@@ -50,7 +52,7 @@ public class ElementUtil {
 		nullCheck(value);
 		getElement(locator).clear();
 		getElement(locator).sendKeys(value);
-		
+
 	}
 
 	public void doSendKeys(By locator, String value, int timeOut) {
@@ -66,7 +68,7 @@ public class ElementUtil {
 	public WebElement getElement(By locator) {
 		try {
 			WebElement element = driver.findElement(locator);
-			
+			highlightElement(element);
 			return element;
 		} catch (NoSuchElementException e) {
 			System.out.println("Element is not present on the page..." + locator);
@@ -353,10 +355,6 @@ public class ElementUtil {
 		return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 
 	}
-	
-	
-	
-	
 
 	/**
 	 * An expectation for checking that an element is present on the DOM of a page
@@ -372,23 +370,16 @@ public class ElementUtil {
 		return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 
 	}
-	
-	
-	public  WebElement waitForElementVisible(By locator, int timeOut, int intervalTime) {
-		
-		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-				.withTimeout(Duration.ofSeconds(timeOut))
-				.pollingEvery(Duration.ofSeconds(intervalTime))
-				.ignoring(NoSuchElementException.class)
+
+	public WebElement waitForElementVisible(By locator, int timeOut, int intervalTime) {
+
+		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver).withTimeout(Duration.ofSeconds(timeOut))
+				.pollingEvery(Duration.ofSeconds(intervalTime)).ignoring(NoSuchElementException.class)
 				.withMessage("===element is not found===");
 
-
 		return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-		
+
 	}
-	
-	
-	
 
 	/**
 	 * An expectation for checking an element is visible and enabled such that you
@@ -453,22 +444,19 @@ public class ElementUtil {
 		}
 		return driver.getCurrentUrl();
 	}
-	
+
 	public Alert waitForJSAlert(int timeOut) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeOut));
 		return wait.until(ExpectedConditions.alertIsPresent());
 	}
-	
+
 	public Alert waitForJSAlert(int timeOut, int intervalTime) {
 
-		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-				.withTimeout(Duration.ofSeconds(timeOut))
-				.pollingEvery(Duration.ofSeconds(intervalTime))
-				.ignoring(NoAlertPresentException.class)
-				.withMessage("===alert is not found===");		
+		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver).withTimeout(Duration.ofSeconds(timeOut))
+				.pollingEvery(Duration.ofSeconds(intervalTime)).ignoring(NoAlertPresentException.class)
+				.withMessage("===alert is not found===");
 		return wait.until(ExpectedConditions.alertIsPresent());
 	}
-	
 
 	public String getAlertText(int timeOut) {
 		Alert alert = waitForJSAlert(timeOut);
@@ -490,9 +478,8 @@ public class ElementUtil {
 		alert.sendKeys(value);
 		alert.accept();
 	}
-	
-	
-	//wait for iframes/frame:
+
+	// wait for iframes/frame:
 	/**
 	 * An expectation for checking whether the given frame is available to switch
 	 * to. If the frame is available it switches the given driver to the specified
@@ -505,19 +492,15 @@ public class ElementUtil {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeOut));
 		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frameLocator));
 	}
-	
-	
+
 	public void waitForFrameByLocator(By frameLocator, int timeOut, int intervalTime) {
-		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-				.withTimeout(Duration.ofSeconds(timeOut))
-				.pollingEvery(Duration.ofSeconds(intervalTime))
-				.ignoring(NoSuchFrameException.class)
-				.withMessage("===frame is not found===");	
-		
+		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver).withTimeout(Duration.ofSeconds(timeOut))
+				.pollingEvery(Duration.ofSeconds(intervalTime)).ignoring(NoSuchFrameException.class)
+				.withMessage("===frame is not found===");
+
 		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frameLocator));
 
 	}
-	
 
 	public void waitForFrameByIndex(int frameIndex, int timeOut) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeOut));
@@ -536,40 +519,48 @@ public class ElementUtil {
 		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frameElement));
 
 	}
-	
-	
+
 	public boolean waitForWindowsToBe(int totalWindows, int timeOut) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeOut));
 		return wait.until(ExpectedConditions.numberOfWindowsToBe(totalWindows));
 	}
-	
-	
+
 	public void isPageLoaded(int timeOut) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeOut));
-		String flag = wait.until(ExpectedConditions.jsReturnsValue("return document.readyState === 'complete'")).toString();//"true"
-		
-			if(Boolean.parseBoolean(flag)) {
-				System.out.println("page is completely loaded");
-			}
-			else {
-				throw new RuntimeException("page is not loaded");
-			}
+		String flag = wait.until(ExpectedConditions.jsReturnsValue("return document.readyState === 'complete'"))
+				.toString();// "true"
+
+		if (Boolean.parseBoolean(flag)) {
+			System.out.println("page is completely loaded");
+		} else {
+			throw new RuntimeException("page is not loaded");
+		}
 	}
 
 	public List<WebElement> waitForVisibilityOfElemenetsLocated(By locator, int timeOut) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeOut));
 		try {
-		return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
-		}catch(Exception e) {
-			
+			return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
+		} catch (Exception e) {
+
 			return List.of();
-			
+
+		}
+	}
+
+	
+	private void highlightElement(WebElement element) {
+		
+		if(Boolean.parseBoolean(DriverFactory.highlight)) {
+			js.flash(element);
 		}
 	}
 	
-	//click
-	//isPageLoaded -- new page
 	
 	
-}
+	
+	
+	// click
+	// isPageLoaded -- new page
 
+}
