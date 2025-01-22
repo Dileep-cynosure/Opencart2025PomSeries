@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="Opencart App Test Regression Suite" thread-count="4"
+	parallel="tests" verbose="4">
+
+	<listeners>
+
+		<listener
+			class-name="com.qa.opencart.listeners.TestAllureListener" />
+			<listener
+			class-name="com.qa.opencart.listeners.AnnotationTransformer" />
+	</listeners>
+	
+
+
+
+	
+	<test name="Account Page Test">
+		<parameter name="browser" value="chrome" />
+		<classes>
+			<class name="com.qa.opencart.testpages.AccountPageTest" />
+		</classes>
+	</test>
+
+
+
+
+
+</suite>	
