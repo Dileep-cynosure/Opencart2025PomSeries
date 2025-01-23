@@ -44,12 +44,12 @@ public class JavaScriptUtil {
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("history.go(0)");
 	}
-	
+
 	public void navigateToBackPage() {
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("history.go(-1)");
 	}
-	
+
 	public void navigateToForwardPage() {
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("history.go(1)");
