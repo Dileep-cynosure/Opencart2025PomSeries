@@ -1,8 +1,9 @@
 package com.qa.opencart.pages;
 
 public class DemoPage {
+	static int a = 44;
 
 	public static void main(String[] args) {
-		int a = 5;
+		System.out.println(a);
 	}
 }
